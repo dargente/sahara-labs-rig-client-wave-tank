@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+<!-- 
+    Configuration properties for the Wave Tank Rig Client.
+ -->
+
+<property name="Wave_Tank_IP"
+		  stanza="Wave Tank" 
+		  mandatory="yes" 
+		  type="STRING" 
+		  restart="no"
+ 		  example="localhost"
+ 		  format="&lt;IP&gt;|&lt;localhost&gt;" 
+ 		  default="">
+The IP address or hostname of the Wave Tank cRIO server.
+</property>
+
+<property name="Wave_Tank_Port"
+		  stanza="Wave Tank" 
+		  mandatory="no" 
+		  type="INTEGER" 
+		  restart="no"
+ 		  example="2044"
+ 		  format="&lt;int&gt;"
+ 		  default="2055">
+The port number of the Wave Tank cRIO server. If not configured the default port
+2055 is used.
+</property>
+
+<property name="Wave_Tank_Username"
+		  stanza="Wave Tank" 
+		  mandatory="yes" 
+		  type="STRING" 
+		  restart="no"
+ 		  example="Wavetank_1"
+ 		  format="&lt;String&gt;"
+ 		  default="">
+The user name to authenticate the rig on the Wave Tank cRIO server.
+</property>
+
+<property name="Wave_Tank_Password"
+		  stanza="Wave Tank" 
+		  mandatory="yes" 
+		  type="STRING" 
+		  restart="no"
+ 		  example="labsjare"
+ 		  format="&lt;String&gt;"
+ 		  default="">
+The password corresponding to the rig user name on the Wave Tank cRIO server.
+</property>
+
+</config>

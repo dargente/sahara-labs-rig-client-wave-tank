@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+             ## Sahara Wave Tank Rig Client ##
+
+Author: Michael Diponio (mdiponio)
+Date: 9th November 2012
+-->
+<project name="WaveTank" default="build" basedir=".">
+	<!-- Properties -->
+	<property name="component.name" value="Power Lab" /> 
+	<property name="build.classes.dir" location="bin" />
+	<property name="lib.dir" location="lib" />
+	<property name="javadoc.dir" location="doc" />
+	<property name="src.dir" location="src" />
+	<property name="dist.dir" location="builds" />
+	<property name="dist.jar" value="uts-remotelabs-wave-tank.jar" />
+	
+	<!-- Classpath -->
+	<path id="project.classpath">
+		<pathelement location="${build.classes.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- Everything! -->
+	<target name="all" depends="clean,build,dist,doc"/>
+	
+	<!-- Code compilation -->
+	<target name="build">
+		<mkdir dir="${build.classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.classes.dir}" debug="on" listfiles="yes">
+			<compilerarg line="-Xlint -Xlint:-path" />
+			<classpath refid="project.classpath" />
+		</javac>
+		<echo>The ${component.name} has been successfully built.</echo>
+	</target>
+	
+	<!-- Package code into JAR. -->
+	<target name="dist" depends="build" >
+		<mkdir dir="${dist.dir}"/>
+		<jar destfile="${dist.dir}/${dist.jar}">
+            <manifest>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="${build.classes.dir}"/>
+			<zipfileset dir="META-INF/" prefix="META-INF/">
+			    <include name="config-descriptions.xml" />
+			</zipfileset>
+			<zipgroupfileset dir="${lib.dir}">
+			    <exclude name="**/NOTICE.txt" />
+			    <include name="**/*.jar" />
+			    <exclude name="**/manifest.mf"/>
+			    <exclude name="**/META-INF/*.SF" />
+			    <exclude name="**/*.txt" />
+			</zipgroupfileset>
+        </jar>
+	</target>
+	
+	<!-- Clean previously built code. -->
+	<target name="clean">
+		<delete dir="${build.classes.dir}" verbose="no" />
+		<delete verbose="no">
+			<fileset dir="${javadoc.dir}">
+				<exclude name="**/README" />
+				<include name="**/*" />
+				<exclude name="${javadoc.dir}" />
+			</fileset>
+		</delete>
+		<delete dir="${javadoc.dir}/resources" />
+		<delete dir="${javadoc.dir}/au" />
+		<delete file="${dist.dir}/${dist.jar}"></delete>
+	</target>
+	
+	<!-- Javadoc -->
+	<target name="doc">
+		<javadoc access="public" destdir="${javadoc.dir}" classpathref="project.classpath" version="true" use="true" 
+			windowtitle="UTS Remote Laboratory Wave Tank Rig Client">
+			<fileset dir="${src.dir}" defaultexcludes="yes">
+				<include name="**/*.java"/>
+				<exclude name="**/*Tester.java" />
+				<exclude name="**/*TestSuite.java" />
+				<exclude name="**/Mock*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+</project>

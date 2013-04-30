@@ -2,7 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/RigClient"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/RigClientCommons"/>
+	<classpathentry kind="lib" path="lib/rigclient-commons.jar"/>
+	<classpathentry kind="lib" path="lib/rigclient.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sahara-labs-rig-client-master"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

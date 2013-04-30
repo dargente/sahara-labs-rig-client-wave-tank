@@ -26,7 +26,6 @@ public class CRIOTcp
     /** Number of analogue data channels. */
     public static final int NUM_AIN_CHANS = 17;
     
-    
     /** String IP address of server. */
     private final String ip;
     
@@ -370,7 +369,7 @@ public class CRIOTcp
      * 
      * @return value of analog inputs
      */
-    public double[] getAnalogueInputs()
+    public double[] getAnalogInputs()
     {   
         return Arrays.copyOf(this.ain, NUM_AIN_CHANS);
     }

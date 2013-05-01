@@ -69,12 +69,18 @@ public class WaveTankController implements IPrimitiveController
     {
     	/* Call getInstance */
     	CRIOHandler crio = CRIOHandler.getInstance();
+    	if(crio == null)
+    	{
+    		this.logger.warn("Could not retrieve CRIOHandler instance. Failing Wave Tank controller initialisation.");
+    		return false;
+    	}
+    	return true;
     }
     
     @Override
     public boolean preRoute()
     {
-
+   
     }
     
     /**
@@ -123,6 +129,7 @@ public class WaveTankController implements IPrimitiveController
      * @throws IOException
      */
     public PrimitiveResponse setPaddleAction(PrimitiveRequest request) throws IOException
+    {
 
     }
     

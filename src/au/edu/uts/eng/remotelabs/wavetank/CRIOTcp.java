@@ -38,7 +38,7 @@ public class CRIOTcp
     /** Input stream of server connection. */
     private DataInputStream in;
     
-    /** Ouput stream of socket connection. */
+    /** Output stream of socket connection. */
     private DataOutputStream out;
     
     /** Analogue channel data. */
@@ -46,6 +46,22 @@ public class CRIOTcp
     
     /** Digital channel data. */
     private byte din;
+    
+    /** Analogue channel output **/
+    private double[] aout;
+    
+    /** Digital channel output **/
+    private boolean[] dout;
+    
+    /** Pump state **/
+    private boolean pump;
+    
+    /** Inverter state **/
+    private boolean inverter;
+    
+    /** Paddle speed **/
+    private double speed;
+    
     
     /** Rig state. */
     private byte rigState;
@@ -156,6 +172,7 @@ public class CRIOTcp
         if (!this.isConnected()) throw new IOException("Not connected.");
         
         this.writeMessage("rig:enable_pump:" + (enabled ? "on" : "off"));
+        this.pump = enabled;
     }
     
     /**
@@ -169,6 +186,7 @@ public class CRIOTcp
         if (!this.isConnected()) throw new IOException("Not connected.");
         
         this.writeMessage("rig:enable_inverter:" + (enabled ? "on" : "off"));
+        this.inverter = enabled;
     }
     
     /**
@@ -182,6 +200,7 @@ public class CRIOTcp
         if (!this.isConnected()) throw new IOException("Not connected.");
         
         this.writeMessage("rig:set_speed:" + String.valueOf(speed));
+        this.speed = speed;
     }
     
     /**
@@ -196,6 +215,7 @@ public class CRIOTcp
         if (!this.isConnected()) throw new IOException("Not connected.");
         
         this.writeMessage("set_AO," + String.valueOf(value) + "," + String.valueOf(channel));
+        aout[channel] = value;
     }
     
     /**
@@ -210,6 +230,7 @@ public class CRIOTcp
         if (!this.isConnected()) throw new IOException("Not connected.");
         
         this.writeMessage("set_DO," + (value ? '1' : '0') + "," + String.valueOf(channel));
+        dout[channel] = value;
     }
     
     /**
@@ -373,7 +394,55 @@ public class CRIOTcp
     {   
         return Arrays.copyOf(this.ain, NUM_AIN_CHANS);
     }
+    
+    /**
+     * Gets the digital output values.
+     * @return array of digital channel outputs
+     */
+    
+    public boolean[] getDigitalOutputs()
+    {
+    	return this.dout;
+    }
+   
+    /**
+     * Gets the analog output values.
+     * @return array of analog channel outputs
+     */
+    public double[] getAnalogOutputs()
+    {
+    	return aout;
+    }
+    
+    /**
+     * Gets the current paddle speed.
+     * @return paddle speed
+     */
+    public double getSpeed()
+    {
+    	return this.speed;
+    }
+    
+    /**
+     * Gets the pump status
+     * @return pump status
+     */
+    
+    public boolean getPump()
+    {
+    	return this.pump;
+    }
+    
+    /**
+     * Gets the inverter status
+     * @return inverter status
+     */
+    public boolean getInverter()
+    {
+    	return this.inverter;
+    }
 
+  
     /**
      * Returns whether there is an alarm.
      * 

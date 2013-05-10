@@ -33,7 +33,7 @@ public class WaveTankController implements IPrimitiveController
     private static final int ANALOG_OUTPUT_CHANS = 8;
     
     /** Interface to cRIO. */
-    private CRIOTcp crio;
+    private CRIOHandler crioHandler;
     
     /** Thread to automatically pull data from the cRIO. */ 
     private Thread crioThread;
@@ -68,8 +68,8 @@ public class WaveTankController implements IPrimitiveController
     public boolean initController()
     {
     	/* Call getInstance */
-    	CRIOHandler crio = CRIOHandler.getInstance();
-    	if(crio == null)
+    	crioHandler = CRIOHandler.getInstance();
+    	if(crioHandler == null)
     	{
     		this.logger.warn("Could not retrieve CRIOHandler instance. Failing Wave Tank controller initialisation.");
     		return false;
@@ -80,7 +80,12 @@ public class WaveTankController implements IPrimitiveController
     @Override
     public boolean preRoute()
     {
-   
+    	if(!crioHandler.isConnected())
+    	{
+    		this.logger.warn("Connection to CRIO failed. Failing action method in preRoute.");
+    		return false;
+    	}
+    	return true;
     }
     
     /**
@@ -91,7 +96,10 @@ public class WaveTankController implements IPrimitiveController
      */
     public PrimitiveResponse dataAction(PrimitiveRequest request)
     {
-
+    	PrimitiveResponse response = new PrimitiveResponse();
+    	response.setSuccessful(true);
+    	response.setResults(this.crioHandler.getData());
+    	return response;
     }
     
     /**
@@ -104,7 +112,8 @@ public class WaveTankController implements IPrimitiveController
      */
     public PrimitiveResponse setPumpAction(PrimitiveRequest request) throws IOException
     {
-
+    	this.crioHandler.crioTCP.enablePump("true".equals(request.getParameters().get("on")));
+    	return this.dataAction(request);
     }
     
     /**
@@ -116,8 +125,9 @@ public class WaveTankController implements IPrimitiveController
      * @throws IOException
      */
     public PrimitiveResponse setInverterAction(PrimitiveRequest request) throws IOException
-    {
-
+    {		
+    	this.crioHandler.crioTCP.enableInverter("true".equals(request.getParameters().get("on")));
+    	return this.dataAction(request);
     }
     
     /**
@@ -130,7 +140,8 @@ public class WaveTankController implements IPrimitiveController
      */
     public PrimitiveResponse setPaddleAction(PrimitiveRequest request) throws IOException
     {
-
+    	this.crioHandler.crioTCP.setSpeed(Double.parseDouble(request.getParameters().get("speed")));
+    	return this.dataAction(request);
     }
     
     /**
@@ -143,7 +154,14 @@ public class WaveTankController implements IPrimitiveController
      */
     public PrimitiveResponse setDigitalOutputAction(PrimitiveRequest request) throws IOException
     {
-
+    	int chan = Integer.parseInt(request.getParameters().get("chan"));
+    	boolean on = "true".equals(request.getParameters().get("val"));
+    	
+    	if (chan < DIGITAL_OUTPUT_CHANS)
+    	{
+    		this.crioHandler.crioTCP.setDigitalOutput(chan, on)chan;
+    	}
+    	return this.dataAction(request);
     }
     
     /**
@@ -156,7 +174,15 @@ public class WaveTankController implements IPrimitiveController
      */
     public PrimitiveResponse setAnalogOutputAction(PrimitiveRequest request) throws IOException
     {
-
+    	int chan = Integer.parseInt(request.getParameters().get("chan"));
+    	double val = Double.parseDouble(request.getParameters().get("val"));
+    	
+    	if (chan < ANALOG_OUTPUT_CHANS)
+    	{
+    		this.crioHandler.crioTCP.setAnalogOutput(chan, val);
+    		this.analogOutputs[chan] = val;
+    	}
+    	return this.dataAction(request);
     }
 
     @Override

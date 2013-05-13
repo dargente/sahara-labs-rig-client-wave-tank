@@ -161,7 +161,6 @@ public class CRIOHandler implements Runnable
 		/* Insert data into map */
 		data.put("pump", String.valueOf(this.crioTCP.getPump()));
 		data.put("inverter", String.valueOf(this.crioTCP.getInverter()));
-		data.put("paddle", String.valueOf(this.crioTCP.getPaddle()));
 		data.put("speed", String.valueOf(this.crioTCP.getSpeed()));
 		data.put("ain", Arrays.toString(this.crioTCP.getAnalogInputs()));
 		data.put("din", Arrays.toString(this.crioTCP.getDigitalInputs()));

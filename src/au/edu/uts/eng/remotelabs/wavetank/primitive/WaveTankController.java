@@ -8,18 +8,13 @@
 package au.edu.uts.eng.remotelabs.wavetank.primitive;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import au.edu.labshare.rigclient.action.detect.TickleActivityDetector;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.IPrimitiveController;
-import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
-import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 import au.edu.uts.eng.remotelabs.wavetank.CRIOHandler;
-import au.edu.uts.eng.remotelabs.wavetank.CRIOTcp;
 
 /**
  * Controller for the Wave Tank controller.
@@ -34,34 +29,13 @@ public class WaveTankController implements IPrimitiveController
     
     /** Interface to cRIO. */
     private CRIOHandler crioHandler;
-    
-    /** Thread to automatically pull data from the cRIO. */ 
-    private Thread crioThread;
-    
-    /** Whether the pump is on. */
-    private boolean pump;
-    
-    /** Whether the inverter is on. */
-    private boolean inverter;
-    
-    /** The speed the paddle is oscillating. */
-    private double paddle;
-    
-    /** The digital output states. */
-    private final boolean[] digitalOutputs;
-    
-    /** The currently set analog output values. */
-    private final double[] analogOutputs;
-    
+
     /** Logger. */
     private final ILogger logger;
     
     public WaveTankController()
     {
         this.logger = LoggerFactory.getLoggerInstance();
-        
-        this.digitalOutputs = new boolean[DIGITAL_OUTPUT_CHANS];
-        this.analogOutputs = new double[ANALOG_OUTPUT_CHANS];
     }
 
     @Override
@@ -159,7 +133,7 @@ public class WaveTankController implements IPrimitiveController
     	
     	if (chan < DIGITAL_OUTPUT_CHANS)
     	{
-    		this.crioHandler.crioTCP.setDigitalOutput(chan, on)chan;
+    		this.crioHandler.crioTCP.setDigitalOutput(chan, on);
     	}
     	return this.dataAction(request);
     }
@@ -180,7 +154,6 @@ public class WaveTankController implements IPrimitiveController
     	if (chan < ANALOG_OUTPUT_CHANS)
     	{
     		this.crioHandler.crioTCP.setAnalogOutput(chan, val);
-    		this.analogOutputs[chan] = val;
     	}
     	return this.dataAction(request);
     }

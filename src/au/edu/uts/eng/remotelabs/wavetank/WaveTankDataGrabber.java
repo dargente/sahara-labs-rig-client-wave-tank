@@ -29,8 +29,7 @@ public class WaveTankDataGrabber implements IDataGrabber
 		String logData = null;
 		Map<String, String> results = crioHandler.getData();
 		
-		logData = // Insert Time stampu!
-				+ results.get("pump") + "\t"
+		logData = results.get("pump") + "\t"
 				+ results.get("inverter") + "\t"
 				+ results.get("speed") + "\t"
 				+ results.get("ain") + "\t"

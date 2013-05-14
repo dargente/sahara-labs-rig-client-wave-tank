@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +27,10 @@ public class LogWriter implements Runnable {
     private BufferedWriter out;
     
     private IDataGrabber dataGrabber;
+    
+    /** Time Stamp Calculation */
+    private long startTime;
+    private Date date;
 	
 	/** Logger **/
     private ILogger logger;
@@ -43,7 +48,8 @@ public class LogWriter implements Runnable {
 		/* Setup output stream */
 	 	try
 	 	{
-	 		BufferedWriter out = new BufferedWriter(new FileWriter(logFile));
+	 		logFile = File.createTempFile("datalog", ".tmp");
+	 		out = new BufferedWriter(new FileWriter(logFile));
 	 	}
 	 	catch (IOException e)
 	 	{
@@ -71,29 +77,66 @@ public class LogWriter implements Runnable {
 	/** Retrieves and writes a log entry **/
 	private void writeEntry()
 	{
-		out.newLine();
-		out.write(dataGrabber.getLine());
+		try
+		{
+			out.newLine();
+			
+			/* Write timestamp */
+			double logTime;
+			date = new Date();
+			logTime = ((date.getTime() - startTime)/ 1000.0);
+			
+			out.write(logTime + "\t");
+			out.write(dataGrabber.getLine());
+		} 
+		catch (IOException e)
+		{
+			this.logger.error("IOException when attempting to write new entry to log file.");
+		}
+		
+
 	}
 	
 	/** Writes the header to the log file **/
 	private void writeHeader()
 	{
-		out.write(dataGrabber.getHeading());
+		try
+		{
+			out.write("Time \t");
+			out.write(dataGrabber.getHeading());
+		} 
+		catch (IOException e)
+		{
+			this.logger.error("IOException when attempting to write header to log file.");
+		}
+
 	}
 	
 	/** Shuts down the logging thread and starts file saving **/
 	public void shutdown()
 	{
 		this.stop = true;
+		
+		try
+		{
+			out.close();
+		}
+		catch(IOException e)
+		{
+			this.logger.warn("IOException while attempting to close BufferedWriter.");
+		}
+		
 		try 
 		{
-			this.scheduler.awaitTermination(2, TimeUnit.SECONDS);
+			/* Wait for the last log entry to bit written */
+			this.scheduler.awaitTermination(500, TimeUnit.MILLISECONDS);
 		} 
 		catch (InterruptedException e) 
 		{
-			this.logger.error("LogWriter thread did not terminate in time.");
-			e.printStackTrace();
+			this.logger.error("LogWriter thread was interrupted before shutdown.");
 		}
+		LogSaver saver = new LogSaver();
+		saver.saveFile(logFile);
 	}
 	
 
@@ -116,6 +159,8 @@ public class LogWriter implements Runnable {
 	public synchronized void startLog()
 	{
 		scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
+		date = new Date();
+		this.startTime = date.getTime();
 	}
 	
 	

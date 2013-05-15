@@ -6,12 +6,13 @@ import au.edu.uts.eng.remotelabs.rigclient.rig.primitive.IPrimitiveController;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 import au.edu.uts.eng.remotelabs.wavetank.CRIOHandler;
+import au.edu.uts.eng.remotelabs.wavetank.CRIOTcp;
 import au.edu.uts.eng.remotelabs.wavetank.WaveTankDataGrabber;
 
 public class LogController implements IPrimitiveController 
 {
     /** Interface to cRIO. */
-    private CRIOHandler crioHandler;
+    private CRIOTcp crioTCP;
 
     /** LogWriter Instance **/
     private LogWriter logWriter;
@@ -55,8 +56,8 @@ public class LogController implements IPrimitiveController
         this.logger = LoggerFactory.getLoggerInstance();
     	
         /* Get instance of CRIO */
-    	crioHandler = CRIOHandler.getInstance();
-    	if(crioHandler == null)
+    	crioTCP = CRIOHandler.acquire();
+    	if(crioTCP == null)
     	{
     		this.logger.warn("Could not retrieve CRIOHandler instance. Failing Wave Tank controller initialisation.");
     		return false;
@@ -75,8 +76,9 @@ public class LogController implements IPrimitiveController
 	}
 
 	@Override
-	public boolean preRoute() {
-		if(!this.crioHandler.isConnected())
+	public boolean preRoute() 
+	{
+		if(!this.crioTCP.isConnected())
 		{
 			this.logger.warn("Connection to CRIO failed. Failing action method.");
 			return false;
@@ -85,7 +87,8 @@ public class LogController implements IPrimitiveController
 	}
 	
 	@Override
-	public void cleanup() {
+	public void cleanup() 
+	{
 		this.endLog();
 	}
 

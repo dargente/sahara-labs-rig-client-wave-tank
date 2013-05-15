@@ -1,6 +1,6 @@
 package au.edu.uts.eng.remotelabs.wavetank;
 
-import java.util.Map;
+import java.util.Arrays;
 
 import au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.IDataGrabber;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
@@ -8,7 +8,7 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 public class WaveTankDataGrabber implements IDataGrabber
 {	
-	CRIOHandler crioHandler;
+	CRIOTcp crioTCP;
 	
 	/** Logger **/
     private ILogger logger;
@@ -16,8 +16,9 @@ public class WaveTankDataGrabber implements IDataGrabber
 	public WaveTankDataGrabber()
 	{
         this.logger = LoggerFactory.getLoggerInstance();
-		crioHandler = CRIOHandler.getInstance();
-    	if(crioHandler == null)
+		crioTCP = CRIOHandler.acquire();
+		
+    	if(crioTCP == null)
     	{
     		this.logger.warn("Could not retrieve CRIOHandler instance. Failing Wave Tank controller initialisation.");
     	}
@@ -27,15 +28,14 @@ public class WaveTankDataGrabber implements IDataGrabber
 	public String getLine()
 	{
 		String logData = null;
-		Map<String, String> results = crioHandler.getData();
 		
-		logData = results.get("pump") + "\t"
-				+ results.get("inverter") + "\t"
-				+ results.get("speed") + "\t"
-				+ results.get("ain") + "\t"
-				+ results.get("din") + "\t"
-				+ results.get("aout") + "\t"
-				+ results.get("dout");
+		logData = String.valueOf(this.crioTCP.getPump()) + "\t"
+				+ String.valueOf(this.crioTCP.getInverter()) + "\t"
+				+ String.valueOf(this.crioTCP.getSpeed()) + "\t"
+				+ Arrays.toString(this.crioTCP.getAnalogInputs()) + "\t"
+				+ Arrays.toString(this.crioTCP.getDigitalInputs()) + "\t"
+				+ Arrays.toString(this.crioTCP.getAnalogOutputs()) + "\t"
+				+ Arrays.toString(this.crioTCP.getDigitalOutputs());
 		
 		return logData;
 	}
@@ -43,12 +43,12 @@ public class WaveTankDataGrabber implements IDataGrabber
 	@Override
 	public String getHeading()
 	{
-		String headings = "Pump" + "/t"
-						+ "Inverter" + "/t"
-						+ "Speed" + "/t"
-						+ "Analog Inputs" + "/t"
-						+ "Digital Inputs" + "/t"
-						+ "Analog Outputs" + "/t"
+		String headings = "Pump" + "\t"
+						+ "Inverter" + "\t"
+						+ "Paddle Speed" + "\t"
+						+ "Analog Inputs" + "\t"
+						+ "Digital Inputs" + "\t"
+						+ "Analog Outputs" + "\t"
 						+ "Digital Outputs";
 		return headings;
 	}

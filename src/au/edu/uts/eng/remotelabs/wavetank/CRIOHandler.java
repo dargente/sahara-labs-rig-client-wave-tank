@@ -7,17 +7,11 @@
 package au.edu.uts.eng.remotelabs.wavetank;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
-import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
-import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
 import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
-import au.edu.uts.eng.remotelabs.wavetank.primitive.WaveTankController;
 
 /**
  * Handles the communication requests between the CRIO and the
@@ -29,10 +23,9 @@ public class CRIOHandler implements Runnable
 
 	// Singleton Instance
 	private static CRIOHandler instance = null;
-	public CRIOTcp crioTCP;
+	public static CRIOTcp crioTCP;
 	
 	private static int acquireCount = 0;
-	private static int leaseCount = 0;
 	
     /** Number of output channels for digital. */
     private static final int DIGITAL_OUTPUT_CHANS = 8;
@@ -42,7 +35,7 @@ public class CRIOHandler implements Runnable
 	
 	private ILogger logger;
 	
-	private Thread crioThread;
+	private static Thread crioThread;
 	
 	/* Private Constructor for Singleton */
 	private CRIOHandler() {
@@ -94,22 +87,22 @@ public class CRIOHandler implements Runnable
 		}
 		
 		/* Create connection with CRIO */
-		this.crioTCP = new CRIOTcp(ip, port);
+		crioTCP = new CRIOTcp(ip, port);
 		
 		try
 		{
-			if(!this.crioTCP.connect())
+			if(!crioTCP.connect())
 			{
 				this.logger.warn("Failed to connect to the cRIO server at " + ip + ':' + port + ", failing Wave Tank initialisation.");
 			}
 
 			/* Run Thread */
-			this.crioThread = new Thread(new CRIOHandler());
-			this.crioThread.start();
+			crioThread = new Thread(new CRIOHandler());
+			crioThread.start();
 			
 			/* Zero Outputs */
-			for (int c = 0; c <= ANALOG_OUTPUT_CHANS; c++) this.crioTCP.setAnalogOutput(c, 0);
-			for (int c = 0; c <= DIGITAL_OUTPUT_CHANS; c++) this.crioTCP.setDigitalOutput(c, false);
+			for (int c = 0; c <= ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
+			for (int c = 0; c <= DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
 		}
 		catch(IOException e)
 		{
@@ -132,7 +125,7 @@ public class CRIOHandler implements Runnable
 		{
 			while (!Thread.interrupted())
 			{
-				this.crioTCP.bufferData();
+				crioTCP.bufferData();
                 Thread.sleep(500);
             }
         }
@@ -145,55 +138,27 @@ public class CRIOHandler implements Runnable
         {
                       /* Shutting down. */         
         }
-		this.crioThread.start();
 	}
 	
-	/**
-	 *  Grabs data that has been fed to the CRIO. Returns it in a hashmap. 
-	 *  
-	 *  @return data
-	 *  */
-	public Map<String, String> getData()
+	public static synchronized CRIOTcp acquire()
 	{
-		Map<String, String> data = new HashMap<String, String>();
-		
-		/* Insert data into map */
-		data.put("pump", String.valueOf(this.crioTCP.getPump()));
-		data.put("inverter", String.valueOf(this.crioTCP.getInverter()));
-		data.put("speed", String.valueOf(this.crioTCP.getSpeed()));
-		data.put("ain", Arrays.toString(this.crioTCP.getAnalogInputs()));
-		data.put("din", Arrays.toString(this.crioTCP.getDigitalInputs()));
-		data.put("aout", Arrays.toString(this.crioTCP.getAnalogOutputs()));
-		data.put("dout",  Arrays.toString(this.crioTCP.getDigitalOutputs()));
-		
-		return data;
-	}
-	
-	public boolean isConnected()
-	{
-		return crioTCP.isConnected();
-	}
-	
-	
-	/* For the singleton pattern. Returns the instance of CRIOHandler.
-	 * Will create the instance if it has not been created already.
-	 * Double checked. */
-	public static CRIOHandler getInstance() 
-	{
-		CRIOHandler r = instance;
-		if (r == null)
+		if(instance == null)
 		{
-			synchronized(CRIOHandler.class)
-			{
-				r = instance;
-				if(r == null)
-				{
-					r = new CRIOHandler();
-					r.init();
-					instance = r;
-				}
-			}
+			instance = new CRIOHandler();
+			instance.init();
+			acquireCount++;
 		}
-		 return r;
-	 }
+		return crioTCP;
+	}
+	
+	public static synchronized void lease()
+	{
+		acquireCount--;
+		if(acquireCount == 0)
+		{
+			crioThread.interrupt();
+			instance = null;
+		}
+	}
+	
 }

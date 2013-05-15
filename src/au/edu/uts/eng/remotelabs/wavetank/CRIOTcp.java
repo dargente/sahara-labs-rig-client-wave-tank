@@ -3,6 +3,9 @@
  *
  * @author Michael Diponio (mdiponio)
  * @date 9th Janurary 2012
+ * 
+ * - 15/5/2013 (DA) - Altered to store the values sent to the CRIO
+ * and added getters to retrieve them. 
  */
 
 package au.edu.uts.eng.remotelabs.wavetank;

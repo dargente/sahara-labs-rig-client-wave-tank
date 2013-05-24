@@ -27,9 +27,8 @@ public class WaveTankDataGrabber implements IDataGrabber
 	@Override
 	public String getLine()
 	{
-		String logData;
 		
-		logData = String.valueOf(this.crioTCP.getPump()) + "\t"
+		String logData = String.valueOf(this.crioTCP.getPump()) + "\t"
 				+ String.valueOf(this.crioTCP.getInverter()) + "\t"
 				+ String.valueOf(this.crioTCP.getSpeed()) + "\t"
 				+ Arrays.toString(this.crioTCP.getAnalogInputs()) + "\t"

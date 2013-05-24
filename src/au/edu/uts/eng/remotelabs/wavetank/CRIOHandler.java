@@ -25,7 +25,7 @@ public class CRIOHandler implements Runnable
 	private static CRIOHandler instance = null;
 	public static CRIOTcp crioTCP;
 	
-	private static int acquireCount = 0;
+	public static int acquireCount = 0;
 	
     /** Number of output channels for digital. */
     private static final int DIGITAL_OUTPUT_CHANS = 8;
@@ -142,23 +142,27 @@ public class CRIOHandler implements Runnable
 	
 	public static synchronized CRIOTcp acquire()
 	{
-		if(instance == null)
+		if(acquireCount == 0)
 		{
 			instance = new CRIOHandler();
 			instance.init();
-			acquireCount++;
 		}
+		acquireCount++;
 		return crioTCP;
 	}
 	
 	public static synchronized void lease()
 	{
-		acquireCount--;
-		if(acquireCount == 0)
+		if(acquireCount > 0)
 		{
-			crioThread.interrupt();
-			instance = null;
+			acquireCount--;
+			
+			if(acquireCount == 0)
+			{
+				crioThread.interrupt();
+			}
 		}
+
 	}
 	
 }

@@ -21,6 +21,11 @@ public class LogController implements IPrimitiveController
     private ILogger logger;
     
  
+    /**
+     * Starts the data log capture.
+     * @param request
+     * @return response
+     */
 	public PrimitiveResponse startLog(PrimitiveRequest request)
 	{
     	PrimitiveResponse response = new PrimitiveResponse();
@@ -29,6 +34,11 @@ public class LogController implements IPrimitiveController
 		return response;
 	}
 	
+	/**
+	 * Pauses the data log capture.
+	 * @param request
+	 * @return response
+	 */
 	public PrimitiveResponse pauseLog(PrimitiveRequest request)
 	{
 		PrimitiveResponse response = new PrimitiveResponse();
@@ -36,6 +46,12 @@ public class LogController implements IPrimitiveController
 		response.setSuccessful(true);
 		return response;
 	}
+	
+	/**
+	 * Resumes the data log capture.
+	 * @param request
+	 * @return response
+	 */
 	
 	public PrimitiveResponse resumeLog(PrimitiveRequest request)
 	{
@@ -45,8 +61,14 @@ public class LogController implements IPrimitiveController
 		return response;
 	}
 	
+	/**
+	 * Signals the LogWriter to end the log and initiate the
+	 * saving process.
+	 * @return true, if successful
+	 */
 	public boolean endLog()
 	{
+		this.logWriter.shutdown();
 		return true;
 	}
     
@@ -71,8 +93,7 @@ public class LogController implements IPrimitiveController
 	@Override
 	public boolean postRoute() 
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override

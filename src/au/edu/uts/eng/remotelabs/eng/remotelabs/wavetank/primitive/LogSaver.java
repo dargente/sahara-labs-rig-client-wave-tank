@@ -41,13 +41,15 @@ public class LogSaver {
 	 * with name LOG_NAME.
 	 * @return 
 	 */
-	public void saveFile(File logFile)
+	public boolean saveFile(File logFile)
 	{
 		boolean exists = false;
 		for(i = 0; !exists; i++)
 		{
 			exists = logFile.renameTo(new File(FILE_ADDRESS + LOG_NAME + i + ".log"));
 		}
+		
+		return true;
 	}
 	
 	/**

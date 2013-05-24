@@ -53,10 +53,10 @@ public class LogWriter implements Runnable {
 	 	}
 	 	catch (IOException e)
 	 	{
-	 		this.logger.error("LogWriter cannot create a temporary log file.");
+	 		this.logger.error(e.getClass().getSimpleName() + ". LogWriter cannot create a temporary log file.");
 	 		return;
 	 	}
-		this.writeHeader();
+
 
 			try
 			{
@@ -64,18 +64,19 @@ public class LogWriter implements Runnable {
 			} 
 			catch (InstantiationException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e)
+				logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class cannot be instantiated.");
+			} 
+			catch (IllegalAccessException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class unaccessible.");
 			}
+			
+			this.writeHeader();
 
 	}
 
 	/** Retrieves and writes a log entry **/
-	private void writeEntry()
+	private boolean writeEntry()
 	{
 		try
 		{
@@ -92,8 +93,10 @@ public class LogWriter implements Runnable {
 		catch (IOException e)
 		{
 			this.logger.error("IOException when attempting to write new entry to log file.");
+			return false;
 		}
 		
+		return true;
 
 	}
 	
@@ -156,11 +159,12 @@ public class LogWriter implements Runnable {
 	
 	
 	/** Sets up a ScheduledExecutorService thread to run the logs **/
-	public synchronized void startLog()
+	public synchronized boolean startLog()
 	{
 		scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
 		date = new Date();
 		this.startTime = date.getTime();
+		return true;
 	}
 	
 	

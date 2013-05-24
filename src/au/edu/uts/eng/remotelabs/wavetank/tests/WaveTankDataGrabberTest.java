@@ -13,7 +13,7 @@ import au.edu.uts.eng.remotelabs.wavetank.WaveTankDataGrabber;
 
 public class WaveTankDataGrabberTest
 {	
-	public static CRIOTcp crioTCP;
+	private CRIOTcp crioTCP;
 	private WaveTankDataGrabber dataGrabber;
 	
 	static double analogInputs[] = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 };
@@ -34,16 +34,15 @@ public class WaveTankDataGrabberTest
 				.addMockedMethod("getAnalogOutputs")
 				.addMockedMethod("getDigitalOutputs")
 				.addMockedMethod("getDigitalInputs")
-				.createMock();
-		
-		
-		expect(crioTCP.getPump()).andReturn(true).times(2);
-		expect(crioTCP.getInverter()).andReturn(true);
+				.createNiceMock();
+    	
+		expect(crioTCP.getPump()).andReturn(true);
+		expect(crioTCP.getInverter()).andReturn(false);
 		expect(crioTCP.getSpeed()).andReturn(2.2);
-		expect(crioTCP.getAnalogInputs()).andReturn(analogInputs).times(2);
-		expect(crioTCP.getDigitalInputs()).andReturn(digitalInputs).times(2);
-		expect(crioTCP.getAnalogOutputs()).andReturn(analogOutputs).times(2);
-		expect(crioTCP.getDigitalOutputs()).andReturn(digitalOutputs).times(2);
+		expect(crioTCP.getAnalogInputs()).andReturn(analogInputs);
+		expect(crioTCP.getDigitalInputs()).andReturn(digitalInputs);
+		expect(crioTCP.getAnalogOutputs()).andReturn(analogOutputs);
+		expect(crioTCP.getDigitalOutputs()).andReturn(digitalOutputs);
 		
 		replay(crioTCP);
 		
@@ -62,14 +61,12 @@ public class WaveTankDataGrabberTest
 	@Test
 	public void testGetLine()
 	{
-
 		dataGrabber = new WaveTankDataGrabber();
-		String results = new String();
 		
-		assertEquals("false	false	0.0	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]	[false, false, false, false, false, false, false, false]	null	null", this.dataGrabber.getLine());
-		System.out.println(crioTCP.getPump());
-		System.out.println(results);
-		
+		assertEquals("false	false	0.0	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]	[false, false, false, false, false, false, false, false]	null	null",
+				this.dataGrabber.getLine());
+
+		verify(crioTCP);
 	}
 
 }

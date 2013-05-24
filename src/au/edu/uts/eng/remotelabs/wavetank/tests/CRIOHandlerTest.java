@@ -14,6 +14,7 @@ public class CRIOHandlerTest
 	CRIOHandler crioHandler;
 	
 	CRIOTcp crioTCP;
+	CRIOTcp crioTCP2;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception
@@ -23,11 +24,19 @@ public class CRIOHandlerTest
 	@Test
 	public void acquireTest()
 	{
-		crioTCP = CRIOHandler.acquire();
-		crioTCP = CRIOHandler.acquire();
-		
-		
+		assertNotNull(crioTCP = CRIOHandler.acquire());
+		assertSame(crioTCP, crioTCP2 = CRIOHandler.acquire());
 
+		assertEquals("Acquire count should be 2.", 2, CRIOHandler.acquireCount);
+		
+		CRIOHandler.lease();
+		
+		assertEquals("Acquire count should be 1.", 1, CRIOHandler.acquireCount);
+		
+		CRIOHandler.lease();
+		
+		//assertEquals("Acquire count should be 0.", 0, CRIOHandler.acquireCount);
+		
 	}
 
 }

@@ -42,12 +42,13 @@ public class CRIOHandler implements Runnable
 		
 	}
 	
+	/**
+	 * Initialisation of the CRIOHandler thread.
+	 * Loads config files, opens comms with the CRIO, begins the CRIOHandler thread and
+	 * zeros the outputs to the CRIO. 
+	 * @return
+	 */
 	private boolean init() {
-		/* 1. Load Config file
-		 * 2. create new CRIOTcp
-		 * 3. Run 500 millisecond thread
-		 * 4. Zero the analogue/digital inputs
-		 */
 		
 		this.logger = LoggerFactory.getLoggerInstance();
 		
@@ -94,6 +95,7 @@ public class CRIOHandler implements Runnable
 			if(!crioTCP.connect())
 			{
 				this.logger.warn("Failed to connect to the cRIO server at " + ip + ':' + port + ", failing Wave Tank initialisation.");
+				return false;
 			}
 
 			/* Run Thread */
@@ -140,6 +142,10 @@ public class CRIOHandler implements Runnable
         }
 	}
 	
+	/**
+	 * When acquiring an instance of CRIOTcp, ensure that the CRIOHandler thread is active.
+	 * @return crioTCP
+	 */
 	public static synchronized CRIOTcp acquire()
 	{
 		if(acquireCount == 0)
@@ -151,6 +157,9 @@ public class CRIOHandler implements Runnable
 		return crioTCP;
 	}
 	
+	/**
+	 * When all controllers are finished using the CRIO, shutdown the CRIOhandler thread.
+	 */
 	public static synchronized void lease()
 	{
 		if(acquireCount > 0)

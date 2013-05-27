@@ -33,16 +33,12 @@ public class WaveTankController implements IPrimitiveController
     private CRIOTcp crioTCP;
 
     /** Logger. */
-    private final ILogger logger;
-    
-    public WaveTankController()
-    {
-        this.logger = LoggerFactory.getLoggerInstance();
-    }
+    private ILogger logger;
 
     @Override
     public boolean initController()
     {
+        this.logger = LoggerFactory.getLoggerInstance();
     	/* Call getInstance */
     	crioTCP = CRIOHandler.acquire();
     	if(crioTCP == null)

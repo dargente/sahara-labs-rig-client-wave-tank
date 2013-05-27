@@ -14,6 +14,11 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
 public class LogWriter implements Runnable {
 	
+	/** Scheduled Executor Parameters **/
+	private static final long INITIAL_DELAY = 0;
+	private static final long LOG_PERIOD = 1;
+	private static final TimeUnit TIME_UNITS = TimeUnit.SECONDS;
+	
     /** Thread Scheduler **/
     private ScheduledExecutorService scheduler;
 
@@ -58,24 +63,26 @@ public class LogWriter implements Runnable {
 	 	}
 
 
-			try
-			{
-				dataGrabber = dataGrabberClass.newInstance();
-			} 
-			catch (InstantiationException e)
-			{
-				logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class cannot be instantiated.");
-			} 
-			catch (IllegalAccessException e)
-			{
-				logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class unaccessible.");
-			}
+		try
+		{
+			dataGrabber = dataGrabberClass.newInstance();
+		} 
+		catch (InstantiationException e)
+		{
+			logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class cannot be instantiated.");
+		} 
+		catch (IllegalAccessException e)
+		{
+			logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class unaccessible.");
+		}
 			
-			this.writeHeader();
-
+		this.writeHeader();
 	}
 
-	/** Retrieves and writes a log entry **/
+	/** 
+	 * Retrieves and writes a log entry 
+	 * @return true if no exception is thrown
+	 **/
 	private boolean writeEntry()
 	{
 		try
@@ -95,13 +102,12 @@ public class LogWriter implements Runnable {
 			this.logger.error("IOException when attempting to write new entry to log file.");
 			return false;
 		}
-		
 		return true;
 
 	}
 	
 	/** Writes the header to the log file **/
-	private void writeHeader()
+	private boolean writeHeader()
 	{
 		try
 		{
@@ -111,12 +117,13 @@ public class LogWriter implements Runnable {
 		catch (IOException e)
 		{
 			this.logger.error("IOException when attempting to write header to log file.");
+			return false;
 		}
-
+		return true;
 	}
 	
 	/** Shuts down the logging thread and starts file saving **/
-	public void shutdown()
+	public boolean shutdown()
 	{
 		this.stop = true;
 		
@@ -127,6 +134,7 @@ public class LogWriter implements Runnable {
 		catch(IOException e)
 		{
 			this.logger.warn("IOException while attempting to close BufferedWriter.");
+			return false;
 		}
 		
 		try 
@@ -137,12 +145,17 @@ public class LogWriter implements Runnable {
 		catch (InterruptedException e) 
 		{
 			this.logger.error("LogWriter thread was interrupted before shutdown.");
+			return false;
 		}
 		LogSaver saver = new LogSaver();
 		saver.saveFile(logFile);
+		return true;
 	}
 	
 
+	/**
+	 * A thread to grab log data periodically, unless paused or stopped.
+	 */
 	@Override
 	public void run() 
 	{
@@ -161,7 +174,7 @@ public class LogWriter implements Runnable {
 	/** Sets up a ScheduledExecutorService thread to run the logs **/
 	public synchronized boolean startLog()
 	{
-		scheduler.scheduleWithFixedDelay(this, 1, 1, TimeUnit.SECONDS);
+		scheduler.scheduleWithFixedDelay(this, INITIAL_DELAY, LOG_PERIOD, TIME_UNITS);
 		date = new Date();
 		this.startTime = date.getTime();
 		return true;

@@ -48,7 +48,6 @@ public class LogSaver {
 		{
 			exists = logFile.renameTo(new File(FILE_ADDRESS + LOG_NAME + i + ".log"));
 		}
-		
 		return true;
 	}
 	

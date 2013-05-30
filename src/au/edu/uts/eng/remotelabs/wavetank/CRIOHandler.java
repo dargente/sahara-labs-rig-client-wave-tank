@@ -103,8 +103,8 @@ public class CRIOHandler implements Runnable
 			crioThread.start();
 			
 			/* Zero Outputs */
-			for (int c = 0; c <= ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
-			for (int c = 0; c <= DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
+			for (int c = 0; c < ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
+			for (int c = 0; c < DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
 		}
 		catch(IOException e)
 		{
@@ -116,7 +116,7 @@ public class CRIOHandler implements Runnable
 		return true;
 	}
 	
-    /* The cRIO expects regular communication from a client. Failure to 
+    /** The cRIO expects regular communication from a client. Failure to 
      * communicate within 5 seconds will cause the cRIO to disconnect and
      * close the TCP stream. To stop this we are using a thread to pull
      * data every 500 milliseconds. */
@@ -138,7 +138,7 @@ public class CRIOHandler implements Runnable
         }
         catch (InterruptedException e)
         {
-                      /* Shutting down. */         
+                      /* Shutting down. */
         }
 	}
 	

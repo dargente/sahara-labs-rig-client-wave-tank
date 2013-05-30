@@ -3,17 +3,19 @@ package au.edu.uts.eng.remotelabs.wavetank.tests;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMockBuilder;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import au.edu.uts.eng.remotelabs.wavetank.CRIOTcp;
 import au.edu.uts.eng.remotelabs.wavetank.WaveTankDataGrabber;
 
 public class WaveTankDataGrabberTest
 {	
-	private CRIOTcp crioTCP;
+	private static CRIOTcp crioTCP;
 	private WaveTankDataGrabber dataGrabber;
 	
 	static double analogInputs[] = new double[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 };
@@ -34,7 +36,7 @@ public class WaveTankDataGrabberTest
 				.addMockedMethod("getAnalogOutputs")
 				.addMockedMethod("getDigitalOutputs")
 				.addMockedMethod("getDigitalInputs")
-				.createNiceMock();
+				.createMock();
     	
 		expect(crioTCP.getPump()).andReturn(true);
 		expect(crioTCP.getInverter()).andReturn(false);
@@ -62,6 +64,7 @@ public class WaveTankDataGrabberTest
 	public void testGetLine()
 	{
 		dataGrabber = new WaveTankDataGrabber();
+		
 		
 		assertEquals("false	false	0.0	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]	[false, false, false, false, false, false, false, false]	null	null",
 				this.dataGrabber.getLine());

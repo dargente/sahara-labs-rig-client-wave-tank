@@ -12,6 +12,10 @@ import java.util.concurrent.TimeUnit;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
+/**
+ * Handles the writing of log files by running a thread
+ * to retrieve data periodically.
+ */
 public class LogWriter implements Runnable {
 	
 	/** Scheduled Executor Parameters **/
@@ -75,13 +79,14 @@ public class LogWriter implements Runnable {
 		{
 			logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class unaccessible.");
 		}
+	 	
 			
 		this.writeHeader();
 	}
 
 	/** 
 	 * Retrieves and writes a log entry 
-	 * @return true if no exception is thrown
+	 * @return true if no exception was thrown
 	 **/
 	private boolean writeEntry()
 	{
@@ -106,7 +111,10 @@ public class LogWriter implements Runnable {
 
 	}
 	
-	/** Writes the header to the log file **/
+	/** 
+	 * Writes the header to the log file
+	 * @return true if no exception was thrown 
+	 **/
 	private boolean writeHeader()
 	{
 		try
@@ -137,15 +145,18 @@ public class LogWriter implements Runnable {
 			return false;
 		}
 		
-		try 
+		if(!scheduler.isShutdown())
 		{
-			/* Wait for the last log entry to bit written */
-			this.scheduler.awaitTermination(500, TimeUnit.MILLISECONDS);
-		} 
-		catch (InterruptedException e) 
-		{
-			this.logger.error("LogWriter thread was interrupted before shutdown.");
-			return false;
+			try 
+			{
+				/* Wait for the last log entry to bit written */
+				this.scheduler.awaitTermination(500, TimeUnit.MILLISECONDS);
+			} 
+			catch (InterruptedException e) 
+			{
+				this.logger.error("LogWriter thread was interrupted before shutdown.");
+				return false;
+			}
 		}
 		LogSaver saver = new LogSaver();
 		saver.saveFile(logFile);
@@ -171,7 +182,10 @@ public class LogWriter implements Runnable {
 	}
 	
 	
-	/** Sets up a ScheduledExecutorService thread to run the logs **/
+	/** 
+	 * Creates the logging thread that runs periodically according to LOG_PERIOD
+	 * and TIME_UNITs.
+	 **/
 	public synchronized boolean startLog()
 	{
 		scheduler.scheduleWithFixedDelay(this, INITIAL_DELAY, LOG_PERIOD, TIME_UNITS);
@@ -181,16 +195,22 @@ public class LogWriter implements Runnable {
 	}
 	
 	
-	/** Sets a flag to resume the log writing **/
-	public synchronized void resumeLog()
+	/** 
+	 * Sets a flag to resume the log writing 
+	 **/
+	public synchronized boolean resumeLog()
 	{
 		this.pause = false;
+		return true;
 	}
 	
 	
-	/** Sets a flag to pause the log writing **/
-	public synchronized void pauseLog()
+	/** 
+	 * Sets a flag to pause the log writing 
+	 **/
+	public synchronized boolean pauseLog()
 	{
 		this.pause = true;
+		return true;
 	}
 }

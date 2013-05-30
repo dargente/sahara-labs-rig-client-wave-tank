@@ -42,7 +42,7 @@ public class LogSaverTest
 	{
 		try
 		{
-			out.write("Test \t");
+			out.write("Log \t");
 
 			logTime = ((date.getTime() - startTime)/ 1000.0);
 			out.write(logTime + "\t");

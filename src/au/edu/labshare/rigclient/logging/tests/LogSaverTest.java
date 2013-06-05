@@ -1,4 +1,4 @@
-package au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.tests;
+package au.edu.labshare.rigclient.logging.tests;
 
 import static org.junit.Assert.*;
 
@@ -10,7 +10,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
-import au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.LogSaver;
+import au.edu.labshare.rigclient.logging.LogSaver;
 
 public class LogSaverTest
 {
@@ -42,7 +42,7 @@ public class LogSaverTest
 	{
 		try
 		{
-			out.write("Log \t");
+			out.write("Ladfog \t");
 
 			logTime = ((date.getTime() - startTime)/ 1000.0);
 			out.write(logTime + "\t");

@@ -1,4 +1,4 @@
-package au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive;
+package au.edu.labshare.rigclient.logging;
 
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
@@ -20,7 +20,12 @@ public class LogController implements IPrimitiveController
     /** Logger. */
     private ILogger logger;
     
+    private enum LogState {
+    	ON, PAUSE
+    }
  
+    private LogState logState;
+    
     /**
      * Starts the data log capture.
      * @param request
@@ -31,6 +36,8 @@ public class LogController implements IPrimitiveController
     	PrimitiveResponse response = new PrimitiveResponse();
     	this.logWriter.startLog();
 		response.setSuccessful(true);
+		logState = LogState.ON;
+		response.addResult("Log State", logState.toString());
 		return response;
 	}
 	
@@ -44,6 +51,8 @@ public class LogController implements IPrimitiveController
 		PrimitiveResponse response = new PrimitiveResponse();
 		this.logWriter.pauseLog();
 		response.setSuccessful(true);
+		logState = LogState.PAUSE;
+		response.addResult("Log State", logState.toString());
 		return response;
 	}
 	
@@ -58,6 +67,8 @@ public class LogController implements IPrimitiveController
 		PrimitiveResponse response = new PrimitiveResponse();
 		this.logWriter.resumeLog();
 		response.setSuccessful(true);
+		logState = LogState.ON;
+		response.addResult("Log State", logState.toString());
 		return response;
 	}
 	

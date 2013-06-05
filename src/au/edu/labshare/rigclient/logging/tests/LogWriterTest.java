@@ -1,4 +1,4 @@
-package au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.tests;
+package au.edu.labshare.rigclient.logging.tests;
 
 import static org.junit.Assert.*;
 
@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
 
-import au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.LogWriter;
+import au.edu.labshare.rigclient.logging.LogWriter;
 import au.edu.uts.eng.remotelabs.wavetank.WaveTankDataGrabber;
 
 public class LogWriterTest
@@ -24,6 +24,8 @@ public class LogWriterTest
 					.createMock();
 		expect(dataGrabber.getHeading()).andReturn("Marco").anyTimes();
 		expect(dataGrabber.getLine()).andReturn("Polo").anyTimes();
+		
+		
 	}
 
 	@Test
@@ -34,7 +36,7 @@ public class LogWriterTest
 		assertTrue(logWriter.startLog());
 		try
 		{
-			Thread.sleep(10000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e)
 		{
 			// TODO Auto-generated catch block
@@ -52,7 +54,7 @@ public class LogWriterTest
 		assertTrue(logWriter.startLog());
 		try
 		{
-			Thread.sleep(10000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e)
 		{
 			// TODO Auto-generated catch block

@@ -1,4 +1,4 @@
-package au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.tests;
+package au.edu.labshare.rigclient.logging.tests;
 
 import static org.junit.Assert.*;
 
@@ -7,8 +7,8 @@ import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
 
-import au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.LogController;
-import au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.LogWriter;
+import au.edu.labshare.rigclient.logging.LogController;
+import au.edu.labshare.rigclient.logging.LogWriter;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveRequest;
 import au.edu.uts.eng.remotelabs.rigclient.rig.IRigControl.PrimitiveResponse;
 

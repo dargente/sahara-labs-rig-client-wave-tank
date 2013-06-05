@@ -2,7 +2,7 @@ package au.edu.uts.eng.remotelabs.wavetank;
 
 import java.util.Arrays;
 
-import au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive.IDataGrabber;
+import au.edu.labshare.rigclient.logging.IDataGrabber;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 

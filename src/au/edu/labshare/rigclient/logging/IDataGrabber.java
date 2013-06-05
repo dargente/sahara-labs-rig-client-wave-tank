@@ -1,4 +1,4 @@
-package au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive;
+package au.edu.labshare.rigclient.logging;
 
 
 /**

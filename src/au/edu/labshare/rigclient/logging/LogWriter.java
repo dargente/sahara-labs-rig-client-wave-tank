@@ -1,14 +1,17 @@
-package au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive;
+package au.edu.labshare.rigclient.logging;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -32,10 +35,14 @@ public class LogWriter implements Runnable {
     
     /** Temporary Log File **/
     private File logFile;
+    private File tempAddress;
+    private Boolean toLock;
     
-    private BufferedWriter out;
+    private OutputStreamWriter out;
+    private FileOutputStream fOut;
     
     private IDataGrabber dataGrabber;
+    
     
     /** Time Stamp Calculation */
     private long startTime;
@@ -46,10 +53,30 @@ public class LogWriter implements Runnable {
 	
     /** Constructor **/
 	public LogWriter(Class<? extends IDataGrabber> dataGrabberClass)
+    //public LogWriter(WaveTankDataGrabber dataGrabberClass)
 	{
         this.logger = LoggerFactory.getLoggerInstance();
 		this.pause = false;
 		this.stop = false;
+		
+		/* Load config details */
+		IConfig conf = ConfigFactory.getInstance();
+		tempAddress = new File(conf.getProperty("Log_Temp_Address"));
+		
+		if(tempAddress == null)
+		{
+			this.logger.warn("The Temp Log Address has not been configured. Using the default directory.");
+			//tempAddress = "";
+		}
+		
+		toLock = Boolean.parseBoolean(conf.getProperty("Temp_File_Lock"));
+		
+		if(toLock == null)
+		{
+			this.logger.warn("The Temp Log Address has not been configured. Using the default directory.");
+			toLock = true;
+		}
+		
 		
 		/* Create single thread "pool" */
 	 	scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -57,8 +84,22 @@ public class LogWriter implements Runnable {
 		/* Setup output stream */
 	 	try
 	 	{
-	 		logFile = File.createTempFile("datalog", ".tmp");
-	 		out = new BufferedWriter(new FileWriter(logFile));
+	 		logFile = File.createTempFile("datalog", ".tmp", tempAddress);
+	 		
+	 		/* Check if write permission */
+	 		if(!logFile.canWrite())
+	 		{
+	 			this.logger.error("Rig Client does not have permission to write to the temp directory.");
+	 		}
+	 		
+	 		fOut = new FileOutputStream(logFile);
+	 		if(toLock)
+	 		{
+	 			FileChannel fileChannel;
+	 			fileChannel = fOut.getChannel();
+	 			fileChannel.lock();
+	 		}
+	 		out = new OutputStreamWriter(fOut);
 	 	}
 	 	catch (IOException e)
 	 	{
@@ -80,7 +121,6 @@ public class LogWriter implements Runnable {
 			logger.error(e.getClass().getSimpleName() + " was thrown. DataGrabber class unaccessible.");
 		}
 	 	
-			
 		this.writeHeader();
 	}
 
@@ -91,20 +131,18 @@ public class LogWriter implements Runnable {
 	private boolean writeEntry()
 	{
 		try
-		{
-			out.newLine();
-			
+		{	
 			/* Write timestamp */
 			double logTime;
 			date = new Date();
 			logTime = ((date.getTime() - startTime)/ 1000.0);
 			
 			out.write(logTime + "\t");
-			out.write(dataGrabber.getLine());
+			out.write(dataGrabber.getLine() + "\r\n");
 		} 
 		catch (IOException e)
 		{
-			this.logger.error("IOException when attempting to write new entry to log file.");
+			this.logger.error(e.getClass().getSimpleName() + " when attempting to write new entry to log file.");
 			return false;
 		}
 		return true;
@@ -120,11 +158,11 @@ public class LogWriter implements Runnable {
 		try
 		{
 			out.write("Time \t");
-			out.write(dataGrabber.getHeading());
+			out.write(dataGrabber.getHeading() + "\r\n");
 		} 
 		catch (IOException e)
 		{
-			this.logger.error("IOException when attempting to write header to log file.");
+			this.logger.error(e.getClass().getSimpleName() + " when attempting to write header to log file.");
 			return false;
 		}
 		return true;
@@ -141,7 +179,7 @@ public class LogWriter implements Runnable {
 		}
 		catch(IOException e)
 		{
-			this.logger.warn("IOException while attempting to close BufferedWriter.");
+			this.logger.warn(e.getClass().getSimpleName() + " while attempting to close OutputStreamWriter.");
 			return false;
 		}
 		
@@ -160,6 +198,7 @@ public class LogWriter implements Runnable {
 		}
 		LogSaver saver = new LogSaver();
 		saver.saveFile(logFile);
+		
 		return true;
 	}
 	

@@ -4,18 +4,18 @@
  * @author Dominic Argente (dargente)
  * @date 14th May 2013
  */
-package au.edu.uts.eng.remotelabs.eng.remotelabs.wavetank.primitive;
+package au.edu.labshare.rigclient.logging;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 
+import au.edu.uts.eng.remotelabs.rigclient.util.ConfigFactory;
+import au.edu.uts.eng.remotelabs.rigclient.util.IConfig;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
 
@@ -25,9 +25,8 @@ import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
  */
 public class LogSaver {
 	
-	private static final String FILE_ADDRESS = "";
-	private static final String LOG_NAME = "WaveTankLog";
-	private static final int MAX_NUM_FILES = 10;
+	private String fileAddress;
+	private String logName;
 	private int i;
 
 	
@@ -37,6 +36,10 @@ public class LogSaver {
 	public LogSaver()
 	{
         this.logger = LoggerFactory.getLoggerInstance();
+        IConfig conf = ConfigFactory.getInstance();
+        
+        fileAddress = conf.getProperty("File_Address");
+        logName = conf.getProperty("Log_Name");
 	}
 	
 	/**
@@ -46,17 +49,21 @@ public class LogSaver {
 	 */
 	public boolean saveFile(File logFile)
 	{
-		File saveFile = new File(LOG_NAME + i + ".log");
+		File saveFile = new File(logName + i + ".log");
 		boolean doesExist = false;
 		for(i = 0; !doesExist; i++)
 		{
-			doesExist = logFile.renameTo(saveFile = new File(FILE_ADDRESS + LOG_NAME + i + ".log"));
+			doesExist = logFile.renameTo(saveFile = new File(fileAddress + logName + i + ".log"));
 		}
 		
-		this.zipFile(saveFile.getAbsolutePath());
+		if(!saveFile.canWrite())
+		{
+			this.logger.warn("No write permission for data logger file at " + saveFile.getAbsolutePath());
+			return false;
+		}
+		//this.zipFile(saveFile);
 		
 		this.logger.info("Logfile saved at " + saveFile.getAbsolutePath());
-		
 		
 		return true;
 	}
@@ -66,15 +73,15 @@ public class LogSaver {
 	 * the initial saved file. For single files.
 	 *  
 	 */
-	private void zipFile(String address)
+	private void zipFile(File address)
 	{	
 		try
 		{
 		BufferedInputStream buff = new BufferedInputStream(new FileInputStream(address));
-		ZipOutputStream out = new ZipOutputStream(new FileOutputStream(LOG_NAME + i + ".zip"));
+		ZipOutputStream out = new ZipOutputStream(new FileOutputStream(logName + i + ".zip"));
 		out.setLevel(9);
 		
-		out.putNextEntry(new ZipEntry(LOG_NAME + i + ".txt"));
+		out.putNextEntry(new ZipEntry(logName + i + ".log"));
 		
 			byte[] b = new byte[2048];
 			
@@ -86,6 +93,7 @@ public class LogSaver {
 		}
 		out.close();
 		buff.close();
+		address.delete();
 		}
 		catch (Throwable e)
 		{

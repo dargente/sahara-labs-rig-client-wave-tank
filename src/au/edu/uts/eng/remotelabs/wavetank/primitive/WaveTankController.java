@@ -40,8 +40,8 @@ public class WaveTankController implements IPrimitiveController
     {
         this.logger = LoggerFactory.getLoggerInstance();
     	/* Call getInstance */
-    	crioTCP = CRIOHandler.acquire();
-    	if(crioTCP == null)
+    	this.crioTCP = CRIOHandler.acquire();
+    	if(this.crioTCP == null)
     	{
     		this.logger.warn("Could not retrieve CRIOTcp instance. Failing Wave Tank controller initialisation.");
     		return false;
@@ -52,7 +52,7 @@ public class WaveTankController implements IPrimitiveController
     @Override
     public boolean preRoute()
     {
-    	if(!crioTCP.isConnected())
+    	if(!this.crioTCP.isConnected())
     	{
     		this.logger.warn("Connection to CRIO failed. Failing action method in preRoute.");
     		return false;

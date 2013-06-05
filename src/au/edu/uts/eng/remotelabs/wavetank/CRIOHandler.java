@@ -99,7 +99,7 @@ public class CRIOHandler implements Runnable
 			}
 
 			/* Run Thread */
-			crioThread = new Thread(new CRIOHandler());
+			crioThread = new Thread(this);
 			crioThread.start();
 			
 			/* Zero Outputs */
@@ -128,7 +128,7 @@ public class CRIOHandler implements Runnable
 			while (!Thread.interrupted())
 			{
 				crioTCP.bufferData();
-                Thread.sleep(500);
+                Thread.sleep(100);
             }
         }
         catch (IOException e)

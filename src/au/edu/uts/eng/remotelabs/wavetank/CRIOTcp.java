@@ -91,7 +91,7 @@ public class CRIOTcp
     public synchronized boolean connect() throws IOException
     {
         this.socket = new Socket(this.ip, this.port);
-        this.socket.setSoTimeout(5000);
+        this.socket.setSoTimeout(50000);
         
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.out = new DataOutputStream(this.socket.getOutputStream());
@@ -218,7 +218,7 @@ public class CRIOTcp
         if (!this.isConnected()) throw new IOException("Not connected.");
         
         this.writeMessage("set_AO," + String.valueOf(value) + "," + String.valueOf(channel));
-        aout[channel] = value;
+        this.aout[channel] = value;
     }
     
     /**
@@ -233,7 +233,7 @@ public class CRIOTcp
         if (!this.isConnected()) throw new IOException("Not connected.");
         
         this.writeMessage("set_DO," + (value ? '1' : '0') + "," + String.valueOf(channel));
-        dout[channel] = value;
+        this.dout[channel] = value;
     }
     
     /**
@@ -414,7 +414,7 @@ public class CRIOTcp
      */
     public double[] getAnalogOutputs()
     {
-    	return aout;
+    	return this.aout;
     }
     
     /**

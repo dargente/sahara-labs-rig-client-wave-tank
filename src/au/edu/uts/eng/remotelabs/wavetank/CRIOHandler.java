@@ -103,8 +103,8 @@ public class CRIOHandler implements Runnable
 			crioThread.start();
 			
 			/* Zero Outputs */
-			for (int c = 0; c < ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
-			for (int c = 0; c < DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
+			for (int c = 0; c <= ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
+			for (int c = 0; c <= DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
 		}
 		catch(IOException e)
 		{

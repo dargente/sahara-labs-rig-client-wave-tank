@@ -39,7 +39,7 @@ public class LogControllerTest
 		
 		this.logController = new LogController();
 		
-		assertEquals(testResponse, logController.startLog(testRequest));
+		assertEquals(testResponse, logController.startLogAction(testRequest));
 		verify(this.logWriter);
 	
 	}

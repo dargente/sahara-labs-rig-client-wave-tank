@@ -19,25 +19,21 @@ public class LogController implements IPrimitiveController
     
     /** Logger. */
     private ILogger logger;
-    
-    private enum LogState {
-    	ON, PAUSE
-    }
  
-    private LogState logState;
+    private boolean logState;
     
     /**
      * Starts the data log capture.
      * @param request
      * @return response
      */
-	public PrimitiveResponse startLog(PrimitiveRequest request)
+	public PrimitiveResponse startLogAction(PrimitiveRequest request)
 	{
     	PrimitiveResponse response = new PrimitiveResponse();
     	this.logWriter.startLog();
 		response.setSuccessful(true);
-		logState = LogState.ON;
-		response.addResult("Log State", logState.toString());
+		logState = true;
+		response.addResult("Log State", Boolean.toString(logState));
 		return response;
 	}
 	
@@ -46,13 +42,13 @@ public class LogController implements IPrimitiveController
 	 * @param request
 	 * @return response
 	 */
-	public PrimitiveResponse pauseLog(PrimitiveRequest request)
+	public PrimitiveResponse pauseLogAction(PrimitiveRequest request)
 	{
 		PrimitiveResponse response = new PrimitiveResponse();
 		this.logWriter.pauseLog();
 		response.setSuccessful(true);
-		logState = LogState.PAUSE;
-		response.addResult("Log State", logState.toString());
+		logState = false;
+		response.addResult("Log State", Boolean.toString(logState));
 		return response;
 	}
 	
@@ -62,13 +58,13 @@ public class LogController implements IPrimitiveController
 	 * @return response
 	 */
 	
-	public PrimitiveResponse resumeLog(PrimitiveRequest request)
+	public PrimitiveResponse resumeLogAction(PrimitiveRequest request)
 	{
 		PrimitiveResponse response = new PrimitiveResponse();
 		this.logWriter.resumeLog();
 		response.setSuccessful(true);
-		logState = LogState.ON;
-		response.addResult("Log State", logState.toString());
+		logState = true;
+		response.addResult("Log State", Boolean.toString(logState));
 		return response;
 	}
 	

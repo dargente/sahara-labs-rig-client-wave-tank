@@ -29,6 +29,9 @@ public class CRIOTcp
     /** Number of analogue data channels. */
     public static final int NUM_AIN_CHANS = 17;
     
+    /** Number of bytes in a 'rig:data?' packet. */
+    public static final int PACKET_SIZE = NUM_AIN_CHANS + 2;
+    
     /** String IP address of server. */
     private final String ip;
     
@@ -282,12 +285,12 @@ public class CRIOTcp
         {
             /* Unexpected response. */
             this.logger.debug("Unexpected response reading data: " + tag);
-            if (len > 0) this.in.read(new byte[len]);
+            if (len > 0) this.in.skip(len);
             return;
         }
         
         /* Protocol dictates we should be getting multiples of 19. */
-        if (len % 19 != 0)
+        if (len % PACKET_SIZE != 0)
         {
             /* Unexpected data length. */
             this.logger.debug("Unexpected data response length: " + len);
@@ -297,31 +300,33 @@ public class CRIOTcp
         /* No data to read. */
         if (len == 0) return;
 
-        byte buf[] = new byte[len];
-        this.in.read(buf);
-        
-        int i, scanChan = 0;
-        for (i = 0; i < len; i += 8)
+        byte buf[] = new byte[PACKET_SIZE * 1024];
+        int read = 0;
+        for (int p = 0; p < len; p += (read = this.in.read(buf)))
         {
-            double val = ByteBuffer.wrap(buf, i, 8).getDouble();
- 
-            if (scanChan < NUM_AIN_CHANS)
+            int i, scanChan = 0;
+            for (i = 0; i < read; i += 8)
             {
-                /* Analog data. */
-                this.ain[scanChan] = val;
-                scanChan++;
-            }
-            else if (scanChan == NUM_AIN_CHANS)
-            {
-                /* Digital data. */
-                this.din = (byte)val;
-                scanChan++;
-            }
-            else
-            {
-                /* Rig state. */
-                this.rigState = (byte)val;
-                scanChan = 0;
+                double val = ByteBuffer.wrap(buf, i, 8).getDouble();
+     
+                if (scanChan < NUM_AIN_CHANS)
+                {
+                    /* Analog data. */
+                    this.ain[scanChan] = val;
+                    scanChan++;
+                }
+                else if (scanChan == NUM_AIN_CHANS)
+                {
+                    /* Digital data. */
+                    this.din = (byte)val;
+                    scanChan++;
+                }
+                else
+                {
+                    /* Rig state. */
+                    this.rigState = (byte)val;
+                    scanChan = 0;
+                }
             }
         }
     }

@@ -43,40 +43,55 @@ function setPaddle()
 }
 
 var isLoggingOn = false;
-var isLoggingPaused = false;
 function toggleLog()
 {
-	/* First time, start log */
-	if(!isLoggingOn) 
-	{
-		//Call startLog
-		$("#logging0 img").attr("src", "uts/wavetank/images/on.png");
-		isLoggingOn = true;
-		return;
-	}
-	
-	/* Resume Log */
-	if(isLoggingPaused)
-	{
-		$.post(
-			"/primitive/json/pc/LoggingController/pa/resumeLog",
+	if(!isLoggingOn)
+		{
+			$.post(
+			"/primitive/json/pc/LoggingController/pa/startLog",
 			function (resp) {
 				if (typeof resp == "object") $("#logging0 img").attr("src", "uts/wavetank/images/on.png");
 			}
-		);
-	}
+			isLoggingOn = isLoggingOn!;
+			return;
+		}
 	
-	/* Pause Log */
-	else if (!isLoggingPaused) $post
-	{
-		$.post(
+	if(isLoggingOn)
+		{
+			$.post(
+				"/primitive/json/pc/LoggingController/pa/stopLog",
+				function (resp) {
+					if (typeof resp == "object") $("#logging0 img").attr("src", "uts/wavetank/images/off.png");
+				}
+			isLoggingOn = isLoggingOn!;
+			return;
+		}
+}
+
+var isLoggingPaused = false;
+function pauseLog()
+{
+	if(!isLoggingPaused)
+		{
+			$.post(
 			"/primitive/json/pc/LoggingController/pa/pauseLog",
 			function (resp) {
-				if (typeof resp == "object") $("#logging0 img").attr("src", "uts/wavetank/images/pause.png");
+				if (typeof resp == "object") $("#logging1 img").attr("src", "uts/wavetank/images/on.png");
 			}
-		);
-	}
-	isLoggingPaused = !isLoggingPaused;
+			isLoggingPaused = isLoggingPaused!;
+			return;
+		}
+	
+	if(isLoggingPaused)
+		{
+			$.post(
+				"/primitive/json/pc/LoggingController/pa/resumeLog",
+				function (resp) {
+					if (typeof resp == "object") $("#logging1 img").attr("src", "uts/wavetank/images/off.png");
+				}
+			isLoggingPaused = isLoggingPaused!;
+			return;
+		}
 }
 
 var digitalOut = [false, false, false, false, false, false, false, false];

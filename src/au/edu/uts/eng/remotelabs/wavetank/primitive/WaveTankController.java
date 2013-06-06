@@ -177,6 +177,6 @@ public class WaveTankController implements IPrimitiveController
     @Override
     public void cleanup()
     {
-    	/* Call crio.lease() */
+    	CRIOHandler.lease();
     }
 }

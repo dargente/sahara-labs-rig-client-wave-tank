@@ -23,7 +23,7 @@ public class CRIOHandler implements Runnable
 
 	// Singleton Instance
 	private static CRIOHandler instance = null;
-	public static CRIOTcp crioTCP;
+	private static CRIOTcp crioTCP;
 	
 	public static int acquireCount = 0;
 	
@@ -97,14 +97,20 @@ public class CRIOHandler implements Runnable
 				this.logger.warn("Failed to connect to the cRIO server at " + ip + ':' + port + ", failing Wave Tank initialisation.");
 				return false;
 			}
+			
+			if(!crioTCP.login(username, password))
+			{
+				this.logger.warn("Failed to login to the cRIO server using " + username + ' ' + password + ", failing Wave Tank initialisation.");
+				return false;
+			}
 
 			/* Run Thread */
 			crioThread = new Thread(this);
 			crioThread.start();
 			
 			/* Zero Outputs */
-			for (int c = 0; c <= ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
-			for (int c = 0; c <= DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
+			for (int c = 0; c < ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
+			for (int c = 0; c < DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
 		}
 		catch(IOException e)
 		{

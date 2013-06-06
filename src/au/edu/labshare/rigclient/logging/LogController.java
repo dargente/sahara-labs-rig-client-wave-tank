@@ -29,8 +29,9 @@ public class LogController implements IPrimitiveController
      */
 	public PrimitiveResponse startLogAction(PrimitiveRequest request)
 	{
-    	PrimitiveResponse response = new PrimitiveResponse();
-    	this.logWriter.startLog();
+		PrimitiveResponse response = new PrimitiveResponse();
+    	logWriter = new LogWriter(WaveTankDataGrabber.class);
+		this.logWriter.startLog();
 		response.setSuccessful(true);
 		logState = true;
 		response.addResult("Log State", Boolean.toString(logState));
@@ -73,10 +74,21 @@ public class LogController implements IPrimitiveController
 	 * saving process.
 	 * @return true, if successful
 	 */
-	public boolean endLog()
+	public PrimitiveResponse endLogAction(PrimitiveRequest request)
 	{
-		this.logWriter.shutdown();
-		return true;
+		PrimitiveResponse response = new PrimitiveResponse();
+		
+		if(!this.logWriter.shutdown())
+		{
+			this.logger.warn("End Log failed.");
+			response.setSuccessful(false);
+			response.setErrorCode(-7);
+			response.setErrorReason("Exception thrown during log saving.");
+			return response;
+		}
+		
+		response.setSuccessful(true);
+		return response;
 	}
     
     @Override
@@ -93,7 +105,6 @@ public class LogController implements IPrimitiveController
     	}
     	
     	/* Create instance of LogWriter  */
-    	logWriter = new LogWriter(WaveTankDataGrabber.class);
     	return true;
 	}
 
@@ -117,7 +128,8 @@ public class LogController implements IPrimitiveController
 	@Override
 	public void cleanup() 
 	{
-		this.endLog();
+		this.logWriter.shutdown();
+		CRIOHandler.lease();
 	}
 
 

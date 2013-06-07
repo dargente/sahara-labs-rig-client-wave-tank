@@ -27,12 +27,6 @@ public class CRIOHandler implements Runnable
 	
 	public static int acquireCount = 0;
 	
-    /** Number of output channels for digital. */
-    private static final int DIGITAL_OUTPUT_CHANS = 8;
-    
-    /** Number of output channels for analog. */
-    private static final int ANALOG_OUTPUT_CHANS = 8;
-	
 	private ILogger logger;
 	
 	private static Thread crioThread;
@@ -107,11 +101,8 @@ public class CRIOHandler implements Runnable
 			/* Run Thread */
 			crioThread = new Thread(this);
 			crioThread.start();
-			
-			/* Zero Outputs */
-			for (int c = 0; c < ANALOG_OUTPUT_CHANS; c++) crioTCP.setAnalogOutput(c, 0);
-			for (int c = 0; c < DIGITAL_OUTPUT_CHANS; c++) crioTCP.setDigitalOutput(c, false);
 		}
+		
 		catch(IOException e)
 		{
 			this.logger.warn("Failed communicating with Wave Tank, exception: " +

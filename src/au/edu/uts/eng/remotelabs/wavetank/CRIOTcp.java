@@ -32,6 +32,12 @@ public class CRIOTcp
     /** Number of bytes in a 'rig:data?' packet. */
     public static final int PACKET_SIZE = NUM_AIN_CHANS + 2;
     
+    /** Number of output channels for digital. */
+    private static final int DIGITAL_OUTPUT_CHANS = 8;
+    
+    /** Number of output channels for analog. */
+    private static final int ANALOG_OUTPUT_CHANS = 8;
+    
     /** String IP address of server. */
     private final String ip;
     
@@ -106,6 +112,12 @@ public class CRIOTcp
         {
             strCh[i] = (char) this.in.readByte();
         }
+        
+        
+		/* Zero Outputs */
+		for (int c = 0; c < ANALOG_OUTPUT_CHANS; c++) this.setAnalogOutput(c, 0);
+		for (int c = 0; c < DIGITAL_OUTPUT_CHANS; c++) this.setDigitalOutput(c, false);
+        
         return "connected".equals(String.valueOf(strCh));
     }
     
@@ -410,16 +422,25 @@ public class CRIOTcp
     
     public boolean[] getDigitalOutputs()
     {
-    	return this.dout;
+    	return Arrays.copyOf(this.dout, DIGITAL_OUTPUT_CHANS);
     }
    
+    public boolean getDigitalOutput(int chan)
+    {
+    	return this.dout[chan];
+    }
     /**
      * Gets the analog output values.
      * @return array of analog channel outputs
      */
     public double[] getAnalogOutputs()
     {
-    	return this.aout;
+    	return Arrays.copyOf(this.aout, ANALOG_OUTPUT_CHANS);
+    }
+    
+    public double getAnalogOutput(int chan)
+    {
+    	return this.aout[chan];
     }
     
     /**

@@ -1,7 +1,5 @@
 package au.edu.uts.eng.remotelabs.wavetank;
 
-import java.util.Arrays;
-
 import au.edu.labshare.rigclient.logging.IDataGrabber;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
@@ -36,16 +34,30 @@ public class WaveTankDataGrabber implements IDataGrabber
 	@Override
 	public String getLine()
 	{
+		StringBuilder logData = new StringBuilder();
 		
-		String logData = String.valueOf(this.crioTCP.getPump()) + "\t"
-				+ String.valueOf(this.crioTCP.getInverter()) + "\t"
-				+ String.valueOf(this.crioTCP.getSpeed()) + "\t"
-				+ Arrays.toString(this.crioTCP.getAnalogInputs()) + "\t"
-				+ Arrays.toString(this.crioTCP.getDigitalInputs()) + "\t"
-				+ Arrays.toString(this.crioTCP.getAnalogOutputs()) + "\t"
-				+ Arrays.toString(this.crioTCP.getDigitalOutputs());
-
-		return logData;
+		logData.append(this.crioTCP.getPump() + ",");
+		logData.append(this.crioTCP.getInverter() + ",");
+		logData.append(this.crioTCP.getSpeed() + ",");
+		
+		
+		for(int c = 0; c < 8; c++)
+		{
+			logData.append(this.crioTCP.getAnalogInput(c) + ",");
+		}
+		for(int c = 0; c < 8; c++)
+		{
+			logData.append((this.crioTCP.getDigitalInput(c) ? 1 : 0) + ",");
+		}
+		for(int c = 0; c < 8; c++)
+		{
+			logData.append(this.crioTCP.getAnalogOutput(c) + ",");
+		}
+		for(int c = 0; c < 8; c++)
+		{
+			logData.append((this.crioTCP.getDigitalOutput(c) ? 1 : 0) + ",");
+		}
+		return logData.toString();
 	}
 	
 	/**
@@ -55,12 +67,12 @@ public class WaveTankDataGrabber implements IDataGrabber
 	@Override
 	public String getHeading()
 	{
-		String headings = "Pump" + "\t"
-						+ "Inverter" + "\t"
-						+ "Paddle Speed" + "\t"
-						+ "Analog Inputs" + "\t"
-						+ "Digital Inputs" + "\t"
-						+ "Analog Outputs" + "\t"
+		String headings = "Pump" + ","
+						+ "Inverter" + ","
+						+ "Paddle Speed" + ","
+						+ "Analog Inputs" + ","
+						+ "Digital Inputs" + ","
+						+ "Analog Outputs" + ","
 						+ "Digital Outputs";
 		return headings;
 	}

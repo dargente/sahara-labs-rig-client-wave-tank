@@ -89,6 +89,8 @@ public class CRIOTcp
         this.port = port;
         
         this.ain = new double[NUM_AIN_CHANS];
+        this.aout = new double[ANALOG_OUTPUT_CHANS];
+        this.dout = new boolean[DIGITAL_OUTPUT_CHANS];
     }
     
     /**
@@ -370,7 +372,7 @@ public class CRIOTcp
      * @param chan channel to get
      * @return true if channel on, false if off
      */
-    public boolean getDigitalInput(int chan)
+    public synchronized boolean getDigitalInput(int chan)
     {
         return (this.din & (int)Math.pow(2, chan)) != 0;
     }
@@ -380,7 +382,7 @@ public class CRIOTcp
      * 
      * @return all digital inputs.
      */
-    public boolean[] getDigitalInputs()
+    public synchronized boolean[] getDigitalInputs()
     {
         boolean d[] = new boolean[8];
         d[0] = (this.din & 0x1) != 0;
@@ -400,7 +402,7 @@ public class CRIOTcp
      * @param chan channel to get
      * @return value of channel
      */
-    public double getAnalogInput(int chan)
+    public synchronized double getAnalogInput(int chan)
     {
         return this.ain[chan];
     }
@@ -410,7 +412,7 @@ public class CRIOTcp
      * 
      * @return value of analog inputs
      */
-    public double[] getAnalogInputs()
+    public synchronized double[] getAnalogInputs()
     {   
         return Arrays.copyOf(this.ain, NUM_AIN_CHANS);
     }
@@ -420,12 +422,12 @@ public class CRIOTcp
      * @return array of digital channel outputs
      */
     
-    public boolean[] getDigitalOutputs()
+    public synchronized boolean[] getDigitalOutputs()
     {
     	return Arrays.copyOf(this.dout, DIGITAL_OUTPUT_CHANS);
     }
    
-    public boolean getDigitalOutput(int chan)
+    public synchronized boolean getDigitalOutput(int chan)
     {
     	return this.dout[chan];
     }
@@ -433,12 +435,12 @@ public class CRIOTcp
      * Gets the analog output values.
      * @return array of analog channel outputs
      */
-    public double[] getAnalogOutputs()
+    public synchronized double[] getAnalogOutputs()
     {
     	return Arrays.copyOf(this.aout, ANALOG_OUTPUT_CHANS);
     }
     
-    public double getAnalogOutput(int chan)
+    public synchronized double getAnalogOutput(int chan)
     {
     	return this.aout[chan];
     }
@@ -447,7 +449,7 @@ public class CRIOTcp
      * Gets the current paddle speed.
      * @return paddle speed
      */
-    public double getSpeed()
+    public synchronized double getSpeed()
     {
     	return this.speed;
     }
@@ -457,7 +459,7 @@ public class CRIOTcp
      * @return pump status
      */
     
-    public boolean getPump()
+    public synchronized boolean getPump()
     {
     	return this.pump;
     }
@@ -466,7 +468,7 @@ public class CRIOTcp
      * Gets the inverter status
      * @return inverter status
      */
-    public boolean getInverter()
+    public synchronized boolean getInverter()
     {
     	return this.inverter;
     }

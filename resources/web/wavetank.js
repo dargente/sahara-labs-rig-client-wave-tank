@@ -6,9 +6,9 @@
 var dataUpdate = undefined;
 
 var isPumpOn = false;
-function setPump()
+function setPump() 
 {
-	/* Disable control until first server update. */
+    /* Disable control until first server update. */
 	if (!dataUpdate) return;
 	
 	isPumpOn = !isPumpOn;
@@ -76,8 +76,9 @@ function pauseLog()
 			$.post(
 			"/primitive/json/pc/LoggingController/pa/pauseLog",
 			function (resp) {
-				if (typeof resp == "object") $("#logging1 img").attr("src", "uts/wavetank/images/on.png");
+				if (typeof resp == "object") $("#logging1 img").attr("src", "uts/wavetank/images/pause.png");
 			}
+			$("#logging1 img").attr("src", "uts/wavetank/images/pause.png");
 			isLoggingPaused = isLoggingPaused!;
 			return;
 		}
@@ -87,7 +88,7 @@ function pauseLog()
 			$.post(
 				"/primitive/json/pc/LoggingController/pa/resumeLog",
 				function (resp) {
-					if (typeof resp == "object") $("#logging1 img").attr("src", "uts/wavetank/images/off.png");
+					if (typeof resp == "object") $("#logging1 img").attr("src", "uts/wavetank/images/on.png");
 				}
 			isLoggingPaused = isLoggingPaused!;
 			return;

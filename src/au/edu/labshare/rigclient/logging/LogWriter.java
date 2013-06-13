@@ -137,7 +137,7 @@ public class LogWriter implements Runnable {
 			date = new Date();
 			logTime = ((date.getTime() - startTime)/ 1000.0);
 			
-			out.write(logTime + "\t");
+			out.write(logTime + ",");
 			out.write(dataGrabber.getLine() + "\r\n");
 		} 
 		catch (IOException e)
@@ -157,7 +157,7 @@ public class LogWriter implements Runnable {
 	{
 		try
 		{
-			out.write("Time \t");
+			out.write("Time" + ",");
 			out.write(dataGrabber.getHeading() + "\r\n");
 		} 
 		catch (IOException e)

@@ -191,7 +191,7 @@ public class CRIOTcp
     {
         if (!this.isConnected()) throw new IOException("Not connected.");
         
-        this.writeMessage("rig:enable_pump:" + (enabled ? "on" : "off"));
+        this.writeMessage("enable_pump:" + (enabled ? "on" : "off"));
         this.pump = enabled;
     }
     
@@ -205,7 +205,7 @@ public class CRIOTcp
     {
         if (!this.isConnected()) throw new IOException("Not connected.");
         
-        this.writeMessage("rig:enable_inverter:" + (enabled ? "on" : "off"));
+        this.writeMessage("enable_inverter:" + (enabled ? "on" : "off"));
         this.inverter = enabled;
     }
     
@@ -219,7 +219,7 @@ public class CRIOTcp
     {
         if (!this.isConnected()) throw new IOException("Not connected.");
         
-        this.writeMessage("rig:set_speed:" + String.valueOf(speed));
+        this.writeMessage("set_speed:" + String.valueOf(speed));
         this.speed = speed;
     }
     
@@ -316,7 +316,7 @@ public class CRIOTcp
 
         byte buf[] = new byte[PACKET_SIZE * 1024];
         int read = 0;
-        for (int p = 0; p < len; p += (read = this.in.read(buf)))
+        for (int p = 0; p < len; p += (read = this.in.read(buf))) // P < 19, p = number of bytes read
         {
             int i, scanChan = 0;
             for (i = 0; i < read; i += 8)

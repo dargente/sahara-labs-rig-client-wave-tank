@@ -54,10 +54,11 @@ public class WaveTankDataGrabberTest
 	public void testGetHeading()
 	{
 		dataGrabber = new WaveTankDataGrabber();
-		String test = "Pump\tInverter\tPaddle Speed\tAnalog Inputs\t" +
-				"Digital Inputs\tAnalog Outputs\tDigital Outputs";
+		String test = "Pump,Inverter,Paddle Speed,Analog Inputs," +
+				"Digital Inputs,Analog Outputs,Digital Outputs";
 		System.out.println(test);
 		assertEquals(test, this.dataGrabber.getHeading());
+		System.out.println(this.dataGrabber.getHeading());
 	}
 	
 	@Test
@@ -65,9 +66,10 @@ public class WaveTankDataGrabberTest
 	{
 		dataGrabber = new WaveTankDataGrabber();
 		
-		
+		System.out.println(this.dataGrabber.getLine());
 		assertEquals("false	false	0.0	[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]	[false, false, false, false, false, false, false, false]	null	null",
 				this.dataGrabber.getLine());
+		
 
 		verify(crioTCP);
 	}

@@ -32,7 +32,7 @@ public class LogWriterTest
 	public void startStoptest()
 	{
 		replay(dataGrabber);
-		logWriter = new LogWriter(WaveTankDataGrabber.class);
+		//logWriter = new LogWriter(dataGrabber);
 		assertTrue(logWriter.startLog());
 		try
 		{
@@ -53,7 +53,7 @@ public class LogWriterTest
 			e.printStackTrace();
 		}
 		
-		logWriter = new LogWriter(WaveTankDataGrabber.class);
+		//logWriter = new LogWriter(dataGrabber);
 		assertTrue(logWriter.startLog());
 		try
 		{
@@ -73,7 +73,7 @@ public class LogWriterTest
 	public void Pausetest()
 	{
 		replay(dataGrabber);
-		logWriter = new LogWriter(WaveTankDataGrabber.class);
+		//logWriter = new LogWriter(dataGrabber);
 		assertTrue(logWriter.startLog());
 		try
 		{
@@ -99,7 +99,7 @@ public class LogWriterTest
 	public void PauseResumetest()
 	{
 		replay(dataGrabber);
-		logWriter = new LogWriter(WaveTankDataGrabber.class);
+		//logWriter = new LogWriter(dataGrabber);
 		assertTrue(logWriter.startLog());
 		try
 		{

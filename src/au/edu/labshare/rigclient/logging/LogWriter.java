@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,8 +22,8 @@ public class LogWriter implements Runnable {
 	
 	/** Scheduled Executor Parameters **/
 	private static final long INITIAL_DELAY = 0;
-	private static final long LOG_PERIOD = 1;
-	private static final TimeUnit TIME_UNITS = TimeUnit.SECONDS;
+	private static final long LOG_PERIOD = 100;
+	private static final TimeUnit TIME_UNITS = TimeUnit.MILLISECONDS;
 	
     /** Thread Scheduler **/
     private ScheduledExecutorService scheduler;
@@ -45,15 +44,13 @@ public class LogWriter implements Runnable {
     
     
     /** Time Stamp Calculation */
-    private long startTime;
-    private Date date;
+    private double entryCount;
 	
 	/** Logger **/
     private ILogger logger;
 	
     /** Constructor **/
 	public LogWriter(Class<? extends IDataGrabber> dataGrabberClass)
-    //public LogWriter(WaveTankDataGrabber dataGrabberClass)
 	{
         this.logger = LoggerFactory.getLoggerInstance();
 		this.pause = false;
@@ -66,7 +63,6 @@ public class LogWriter implements Runnable {
 		if(tempAddress == null)
 		{
 			this.logger.warn("The Temp Log Address has not been configured. Using the default directory.");
-			//tempAddress = "";
 		}
 		
 		toLock = Boolean.parseBoolean(conf.getProperty("Temp_File_Lock"));
@@ -133,20 +129,18 @@ public class LogWriter implements Runnable {
 		try
 		{	
 			/* Write timestamp */
-			double logTime;
-			date = new Date();
-			logTime = ((date.getTime() - startTime)/ 1000.0);
-			
-			out.write(logTime + ",");
+			double timeStamp = ((LOG_PERIOD / 1000.0) * entryCount);
+			out.write(timeStamp + ",");
 			out.write(dataGrabber.getLine() + "\r\n");
+			entryCount++;
 		} 
 		catch (IOException e)
 		{
 			this.logger.error(e.getClass().getSimpleName() + " when attempting to write new entry to log file.");
+			entryCount++;
 			return false;
 		}
 		return true;
-
 	}
 	
 	/** 
@@ -228,8 +222,7 @@ public class LogWriter implements Runnable {
 	public synchronized boolean startLog()
 	{
 		scheduler.scheduleWithFixedDelay(this, INITIAL_DELAY, LOG_PERIOD, TIME_UNITS);
-		date = new Date();
-		this.startTime = date.getTime();
+		entryCount = 0;
 		return true;
 	}
 	

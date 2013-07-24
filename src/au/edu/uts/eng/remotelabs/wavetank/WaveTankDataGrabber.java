@@ -1,5 +1,7 @@
 package au.edu.uts.eng.remotelabs.wavetank;
 
+import java.text.DecimalFormat;
+
 import au.edu.labshare.rigclient.logging.IDataGrabber;
 import au.edu.uts.eng.remotelabs.rigclient.util.ILogger;
 import au.edu.uts.eng.remotelabs.rigclient.util.LoggerFactory;
@@ -35,15 +37,16 @@ public class WaveTankDataGrabber implements IDataGrabber
 	public String getLine()
 	{
 		StringBuilder logData = new StringBuilder();
+		DecimalFormat df = new DecimalFormat("#.###");
 		
 		logData.append(this.crioTCP.getPump() + ",");
 		logData.append(this.crioTCP.getInverter() + ",");
-		logData.append(this.crioTCP.getSpeed() + ",");
+		logData.append(df.format(this.crioTCP.getSpeed()) + ",");
 		
 		
 		for(int c = 0; c < 8; c++)
 		{
-			logData.append(this.crioTCP.getAnalogInput(c) + ",");
+			logData.append(df.format(this.crioTCP.getAnalogInput(c)) + ",");
 		}
 		for(int c = 0; c < 8; c++)
 		{
@@ -51,12 +54,14 @@ public class WaveTankDataGrabber implements IDataGrabber
 		}
 		for(int c = 0; c < 8; c++)
 		{
-			logData.append(this.crioTCP.getAnalogOutput(c) + ",");
+			logData.append(df.format(this.crioTCP.getAnalogOutput(c)) + ",");
 		}
 		for(int c = 0; c < 8; c++)
 		{
 			logData.append((this.crioTCP.getDigitalOutput(c) ? 1 : 0) + ",");
 		}
+		// Delete last comma on the line
+		logData.deleteCharAt(logData.length() - 1);
 		return logData.toString();
 	}
 	
